@@ -40,10 +40,15 @@ public class SadApplication
 
     @GetMapping("/info")
     @ResponseBody
-    public RepresentativeInfo info(@RequestParam String code, @RequestBody String cert)
+    public ResponseEntity info(@RequestParam String code, @RequestBody String uid)
     {
-        //Search db for this cert. If found then
-        return new RepresentativeInfo();
+        String sha1UID = DigestUtils.sha1Hex(uid);
+
+        if(deviceRepository.existsById(sha1UID))
+        {
+            return new ResponseEntity<>(new RepresentativeInfo(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/auth")
