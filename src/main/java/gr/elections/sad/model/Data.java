@@ -14,6 +14,10 @@ public class Data
 
     private String data;
 
+    public Data()
+    {
+    }
+
     public Data(String data)
     {
         this.data = data;

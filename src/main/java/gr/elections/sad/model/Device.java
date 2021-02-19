@@ -1,7 +1,5 @@
 package gr.elections.sad.model;
 
-import org.hibernate.annotations.DynamicUpdate;
-
 import javax.persistence.*;
 
 @Entity
@@ -9,7 +7,7 @@ public class Device
 {
     @Id
     @Column(unique = true)
-    private final String code;
+    private String code;
     private int codeTries;
 
     private String pass;
@@ -18,6 +16,10 @@ public class Device
 
     @OneToOne(cascade = CascadeType.ALL)
     private Data data;
+
+    public Device()
+    {
+    }
 
     public Device(String code)
     {
