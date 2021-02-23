@@ -38,7 +38,6 @@ public class SadApplication
         {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        System.out.println("Registering new device with code: "+code);
         Device dev = new Device(code);
         deviceRepository.save(dev);
 
@@ -48,7 +47,7 @@ public class SadApplication
     }
 
     @GetMapping("/authme")
-    public ResponseEntity authme(@CookieValue(value = "id", defaultValue = "none") String code)
+    public ResponseEntity authme(@CookieValue(value = "code", defaultValue = "none") String code)
     {
         if (!code.equalsIgnoreCase("none"))
         {
@@ -58,17 +57,18 @@ public class SadApplication
                 Device dev = device.get();
                 Random r = new Random();
                 String pass = String.format("%04d", r.nextInt(10000));
+                System.out.println(pass);
                 dev.setPass(DigestUtils.sha1Hex(pass));
                 deviceRepository.save(dev);
 
-                return ResponseEntity.ok(pass);
+                return new ResponseEntity(HttpStatus.OK);
             }
         }
         return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping("/auth")
-    public ResponseEntity auth(@RequestBody String pass, @CookieValue(value = "id", defaultValue = "none") String code)
+    public ResponseEntity auth(@RequestBody String pass, @CookieValue(value = "code", defaultValue = "none") String code)
     {
         if (!code.equalsIgnoreCase("none"))
         {
@@ -79,7 +79,7 @@ public class SadApplication
                 if(dev.getPassCount() < 3)
                 {
                     dev.setPassCount(dev.getPassCount() + 1);
-                    if (dev.getPass().equalsIgnoreCase(DigestUtils.sha1Hex(pass)))
+                    if (dev.getPass().equalsIgnoreCase(DigestUtils.sha1Hex(pass.substring(0,4))))
                     {
                         dev.setAuthed((short) 54);
                         deviceRepository.save(dev);
@@ -92,7 +92,7 @@ public class SadApplication
     }
 
     @PostMapping("/data")
-    public ResponseEntity data(@RequestBody String data, @CookieValue(value = "id", defaultValue = "none") String code)
+    public ResponseEntity data(@RequestBody String data, @CookieValue(value = "code", defaultValue = "none") String code)
     {
         if (!code.equalsIgnoreCase("none"))
         {
